@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!-- 配置数据源，可以使用连接池或者简单的 DriverManager 数据源 -->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC" />
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://localhost:3306/data_analytics_hub" />
+                <property name="username" value="root" />
+                <property name="password" value="123456" />
+                <property name="defaultAutoCommit" value="true" />
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 配置映射文件，用于将 Java 对象映射到数据库表 -->
+    <mappers>
+        <mapper resource="mapper/UserDao.xml" />
+    </mappers>
+</configuration>

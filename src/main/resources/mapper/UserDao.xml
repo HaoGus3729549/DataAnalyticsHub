@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haogus.dao.UserDao">
+    <select id="selectById" resultType="java.lang.Object">
+        SELECT *
+        FROM user
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectOneByUserName" resultType="com.haogus.entity.User">
+        SELECT *
+        FROM user
+        WHERE user_name = #{userName}
+          and password = #{password}
+    </select>
+
+    <update id="updateUserById">
+        UPDATE `data_analytics_hub`.`user`
+        SET `first_name` = #{firstName},
+            `last_name`  = #{lastName},
+            `user_name`  = #{userName},
+            `password`   = #{password}
+        WHERE `id` = #{id};
+    </update>
+
+    <insert id="insert">
+        INSERT INTO `data_analytics_hub`.`user` (`first_name`, `last_name`, `user_name`, `password`, `is_vip`)
+        VALUES (#{user.firstName}, #{user.lastName}, #{user.userName}, #{user.password}, #{user.isVip});
+    </insert>
+
+    <select id="userIsExist" resultType="java.lang.Integer">
+        select count(1)
+        from user
+        where user_name = #{userName};
+    </select>
+
+
+    <update id="updateVip">
+        UPDATE `data_analytics_hub`.`user`
+        SET `is_vip` = 1
+        WHERE `id` = #{id};
+    </update>
+</mapper>
