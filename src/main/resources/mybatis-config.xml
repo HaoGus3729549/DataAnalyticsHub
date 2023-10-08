@@ -20,5 +20,6 @@
     <!-- 配置映射文件，用于将 Java 对象映射到数据库表 -->
     <mappers>
         <mapper resource="mapper/UserDao.xml" />
+        <mapper resource="mapper/PostDao.xml" />
     </mappers>
 </configuration>

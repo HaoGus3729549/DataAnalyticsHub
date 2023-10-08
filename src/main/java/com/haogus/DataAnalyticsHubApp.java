@@ -1,9 +1,6 @@
 package com.haogus;
 
-import com.haogus.backend.CSVExporter;
-import com.haogus.backend.CSVImporter;
-import com.haogus.backend.Post;
-import com.haogus.backend.Posts;
+import com.haogus.backend.*;
 import com.haogus.dao.UserDao;
 import com.haogus.entity.User;
 import com.haogus.util.MysqlUtil;
@@ -21,9 +18,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -298,35 +297,85 @@ public class DataAnalyticsHubApp extends Application {
 
         // Add Post Form
         VBox addPostForm = new VBox(10);
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-        LocalDateTime curentDate = LocalDateTime.now();
-        String curDate = dtf.format(curentDate);
+
         addPostForm.setPadding(new Insets(20));
-        TextField id = new TextField("#id");
-        TextField content = new TextField("Content");
-        TextField author = new TextField("Author");
-        TextField likes = new TextField("likes");
-        TextField shares = new TextField("shares");
-        TextField date = new TextField(curDate);
+
+        TextField id = new TextField();
+        id.setPromptText("请输入id");
+        id.setTextFormatter(new TextFormatter<>(change ->
+                (change.getControlNewText().matches("\\d*")) ? change : null));
+
+        TextField content = new TextField();
+        content.setPromptText("请输入内容");
+
+        TextField author = new TextField();
+        author.setPromptText("请输入作者");
+
+        TextField likes = new TextField();
+        likes.setPromptText("请输入点赞数");
+        likes.setTextFormatter(new TextFormatter<>(change ->
+                (change.getControlNewText().matches("\\d*")) ? change : null));
+
+        TextField shares = new TextField();
+        shares.setPromptText("请输入分享数");
+        shares.setTextFormatter(new TextFormatter<>(change ->
+                (change.getControlNewText().matches("\\d*")) ? change : null));
+
+        // TextField date = new TextField();
+        DatePicker date = new DatePicker();
+        date.setPromptText("请输入创建日期");
+
         Button postAddButton = new Button("Add Post");
         postAddButton.setOnAction(ae -> {
-            try {
-                if (posts.addPost(new Post(Integer.parseInt(id.getText()),
-                        content.getText(), author.getText(), Integer.parseInt(likes.getText()),
-                        Integer.parseInt(shares.getText()), date.getText()))) {
-                    showAlert(AlertType.INFORMATION, "Added", "Your Post Has Been Added");
-                    id.setText("#ID");
-                    content.setText("Content");
-                    author.setText("Author");
-                    likes.setText("#likes");
-                    shares.setText("#shares");
-                    date.setText(curDate);
-                } else {
-                    showAlert(AlertType.ERROR, "Failed", "");
-                }
-            } catch (Exception e) {
-                showAlert(AlertType.ERROR, "Failed", "");
+
+
+            String idText = id.getText();
+            String contentText = content.getText();
+            String authorText = author.getText();
+            String likesText = likes.getText();
+            String sharesText = shares.getText();
+            LocalDate dateValue = date.getValue();
+
+            if (StringUtils.isBlank(idText) ||
+                    StringUtils.isBlank(contentText) ||
+                    StringUtils.isBlank(authorText) ||
+                    StringUtils.isBlank(likesText) ||
+                    StringUtils.isBlank(sharesText) ||
+                    dateValue == null
+            ) {
+                showAlert(AlertType.ERROR, "Error", "Please input post all info");
+                return;
             }
+
+
+            Post post = new Post();
+            post.setId(Integer.parseInt(idText));
+            post.setContent(contentText);
+            post.setAuthor(authorText);
+            post.setLikes(Integer.parseInt(likesText));
+            post.setShares(Integer.parseInt(sharesText));
+
+            // 将 LocalDate 转换为 LocalDateTime，时间部分设为零
+
+            LocalDateTime localDateTime = dateValue.atStartOfDay();
+
+            // 格式化 LocalDateTime 为字符串
+            post.setDateTime(localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            PostManager postManager = new PostManager();
+            if (postManager.existPost(post.getId())) {
+                showAlert(AlertType.ERROR, "Error", "Post Id exist");
+                return;
+            }
+            postManager.addPost(post);
+            posts.addPost(post);
+            System.out.println("post = " + post);
+            id.setText("");
+            content.setText("");
+            author.setText("");
+            likes.setText("");
+            shares.setText("");
+            date.setValue(null);
+            showAlert(AlertType.INFORMATION, "Added", "Your Post Has Been Added");
         });
         addPostForm.getChildren().addAll(
                 new Label("Add Social Media Post"),

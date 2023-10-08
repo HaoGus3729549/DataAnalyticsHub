@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haogus.dao.PostDao">
+    <insert id="addPost">
+        INSERT INTO `data_analytics_hub`.`post` (`id`, `content`, `author`, `likes`, `shares`, `date_time`)
+        VALUES (#{post.id}, #{post.content}, #{post.author}, #{post.likes}, #{post.shares}, #{post.dateTime});
+    </insert>
+
+    <select id="existPost" resultType="int">
+        select count(1) from post where id=#{postId};
+    </select>
+</mapper>
