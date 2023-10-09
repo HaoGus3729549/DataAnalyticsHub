@@ -67,15 +67,8 @@ public class DataAnalyticsHubApp extends Application {
 
     private MenuBar createMenuBar(Stage primaryStage) {
         MenuBar menuBar = new MenuBar();
-
         // Create a File menu
         Menu fileMenu = new Menu("File");
-
-        // Create a New Post menu item
-        MenuItem newPostMenuItem = new MenuItem("New Post");
-        newPostMenuItem.setOnAction(e -> showNewPostDialog(primaryStage));
-        fileMenu.getItems().add(newPostMenuItem);
-
         // Add the File menu to the menu bar
         menuBar.getMenus().add(fileMenu);
 
@@ -122,6 +115,7 @@ public class DataAnalyticsHubApp extends Application {
                 return;
             }
             boolean operation = createUser(firstName, lastName, userName, password);
+            //自动登录
             userLogin(userName, password);
             showDashboard(primaryStage); // Redirect to the dashboard
         });
@@ -148,6 +142,11 @@ public class DataAnalyticsHubApp extends Application {
         loginButton.setOnAction(e -> {
             String username = usernameTextField.getText();
             String password = passwordTextField.getText();
+
+            if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+                showAlert(AlertType.ERROR, "Login Failed", "The user name or password cannot be empty");
+                return;
+            }
 
             if (!userLogin(username, password)) {
                 showAlert(AlertType.ERROR, "Login Failed", "Please enter the correct account number or password.");
@@ -254,7 +253,7 @@ public class DataAnalyticsHubApp extends Application {
         dashboard.setTop(menuBar);
 
         User currentUser = UserUtil.getCurrentUser();
-        // wecome screen
+
         VBox welcome = new VBox(10);
         welcome.setPadding(new Insets(200));
         Label welcomeMessage = new Label("Hello: " + currentUser.getUserName() + "\n" + "Welcome to Data Analytics Hub Dashboard");
@@ -516,26 +515,7 @@ public class DataAnalyticsHubApp extends Application {
 
         return dashboard;
     }
-
-    private void createPieChart() {
-        // Create data for the pie chart
-        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
-                new PieChart.Data("0-99 Shares", 30),     // Change the actual share counts
-                new PieChart.Data("100-999 Shares", 45), // Change the actual share counts
-                new PieChart.Data("1000+ Shares", 25)   // Change the actual share counts
-        );
-
-        // Create the pie chart
-        PieChart pieChart = new PieChart(pieChartData);
-
-    }
-
-    private void showNewPostDialog(Stage primaryStage) {
-        // Implement the new post dialog here
-        // You can use JavaFX dialogs or create a custom dialog
-        System.out.println("New Post Dialog");
-    }
-
+    
     private void logout(Stage primaryStage) {
         UserUtil.currentUser = null;
         primaryStage.setTitle("Data Analytics Hub");
